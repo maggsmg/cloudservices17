@@ -13,21 +13,30 @@ con.connect(function(err) {
 exports.addPatient = function(user, callback){
 	// db.insert('accounts', ['username', 'password'], account, callback)
 	const errors = [];
-  console.log(user);
+  //console.log(user);
+  var inserted_id;
 	//con.connect(function(err) {
 	  //if (err) throw err;
     var query_string = "INSERT INTO users (role, name, email, password) VALUES (" + "'" + user.role + "','" + user.name + "','" + user.email + "','" + user.password + "');"
     console.log(query_string);
     con.query(query_string, function (err, result, fields) {
 	    if (err) throw err;
+      inserted_id = result.insertId;
 	    console.log(result);
-			callback(result, errors);
-	    console.log('Aqui entro');
-	  //});
-	});
+      console.log(inserted_id);
+	  });
 
-	// console.log('Aqui entro');
-	// callback('JALO', errors);
+
+    //var query_string2 = "INSERT INTO patient (user_id, age, gender, weight, height) VALUES (" + "'" + inserted_id + "','" + user.age + "','" + user.gender + "','" + "','" + user.weight + "','" + user.height + "');"
+    //console.log(query_string2);
+    /*
+    con.query(query_string2, function (err, result, fields) {
+	    if (err) throw err;
+	    console.log(result)
+			callback(result, errors);
+	  });*/
+
+	 callback('SUCCESS', errors);
 }
 
 
