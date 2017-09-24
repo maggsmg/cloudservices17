@@ -43,13 +43,14 @@ app.post('/user/create', function (req,res) {
 
   userManager.create(userCreate, function(createdUser, errors){
     if(errors.length == 0){
-  		res.json(createdUser)
+      console.log('aqui entro 1');
+  		res.send('OK');
   	}else{
   		res.status(400).json(errors)
   	}
 	})
 
-  res.send();
+  //res.send();
 
 
 });

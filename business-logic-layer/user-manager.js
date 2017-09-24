@@ -20,8 +20,7 @@ exports.create = function(user, callback){
 }
 
 exports.retrieve = function(id, callback){
-	console.log('entro a la funcion')
-
+	//console.log('entro a la funcion')
 	userRepository.getPatient(id, callback);
 	//callback(null,errors);
 }
