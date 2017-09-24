@@ -1,0 +1,16 @@
+phpmyadmin-ctl install
+
+mysql-ctl start
+
+mysql -u root -p
+
+https://projectju-maggsmtz.c9users.io/phpmyadmin 
+
+Root user: maggsmtz
+db: C9
+passwd = ''
+
+Mysql Commands:
+ show databases;
+ use 'database';
+ show tables;
