@@ -2,19 +2,19 @@ var mysql = require('mysql');
 
 var con = mysql.createConnection({
   host: "localhost",
-  user: "maggsmtz",
+  user: "root",
   password: "",
-  database: "c9"
+  database: "cloudservices"
 });
 
 
 exports.addPatient = function(account, callback){
 	// db.insert('accounts', ['username', 'password'], account, callback)
-	const errors = []
+	const errors = [];
 
 	con.connect(function(err) {
 	  if (err) throw err;
-	  con.query("SELECT * FROM user", function (err, result, fields) {
+	  con.query("SELECT (name, email,) FROM users", function (err, result, fields) {
 	    if (err) throw err;
 	    	console.log(result);
 			callback(result, errors);
@@ -28,9 +28,11 @@ exports.addPatient = function(account, callback){
 
 
 exports.getPatient = function(id, callback){
+  const errors = [];
+
 	con.connect(function(err) {
 		if (err) throw err;
-		con.query("SELECT * FROM users", function (err, result, fields) {
+		con.query("SELECT name, email FROM users WHERE (id =" + id +")", function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);
     		callback(result,errors);
