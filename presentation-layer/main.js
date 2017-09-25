@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 // const bodyParser = require('body-parser');
 const typeCheck = require('type-check').typeCheck;
 const userManager = require('../business-logic-layer/user-manager');
+const patientManager = require('../business-logic-layer/patient-manager');
 
 var app = express();
 var server = http.createServer(app);
@@ -41,9 +42,16 @@ app.post('/user/create', function (req,res) {
   		return
   }
 
-  userManager.create(userCreate, function(status, errors){
+  userManager.create(userCreate, function(idCreated,status, errors){
     if(errors.length == 0){
+      console.log(idCreated + 'hola');
   		res.send(status);
+      //CREATE PATIENT
+      patientManager.create(userCreate, idCreated, (status, errors) => {
+        if(errors.length == 0){
+          res.send(status); //Como hacer que esto tambien aparezca
+        }
+      });
   	}else{
   		res.status(400).json(errors)
   	}
@@ -78,7 +86,9 @@ app.post('/user/newRegister', function (req,res) {
   const registerCreate = req.body;
   console.log(registerCreate);
 
+});
+
+
+app.listen(8000 , () => {
+  console.log('Server listening on port 8000');
 })
-
-
-app.listen(8000)
