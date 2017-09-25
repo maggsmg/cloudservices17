@@ -10,17 +10,17 @@ con.connect(function(err) {
   if (err) throw err;
 });
 
-exports.addUser = function(user, callback){
+exports.addDoctor = function(userCreate, idCreated, callback){
 	const errors = [];
-  var inserted_id;
+    var query_string = "INSERT INTO doctors (user_id, hospital, specialty) VALUES (" + "'" + idCreated + "','" + userCreate.hospital + "','" + userCreate.specialty + "');"
+    console.log(query_string);
+    con.query(query_string, function (err, result, fields) {
+	    if (err) throw err;
+      inserted_id = result.insertId;
+	    console.log(result);
+      console.log(inserted_id);
 
-  var query_string = "INSERT INTO users (role, name, email, password) VALUES (" + "'" + user.role + "','" + user.name + "','" + user.email + "','" + user.password + "');"
-  console.log(query_string);
-  con.query(query_string, function (err, result, fields) {
-	   if (err) throw err;
-     inserted_id = result.insertId;
-	   console.log(result); //Dejarlo o no dejarlo esta es la cuestion
-     callback (result.insertId,'User created', errors);
+      callback('Doctor Created', errors);
 	  });
 }
 

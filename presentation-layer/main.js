@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 const typeCheck = require('type-check').typeCheck;
 const userManager = require('../business-logic-layer/user-manager');
 const patientManager = require('../business-logic-layer/patient-manager');
+const doctorManager = require('../business-logic-layer/doctor-manager');
 
 var app = express();
 var server = http.createServer(app);
@@ -29,6 +30,7 @@ app.post('/user/create', function (req,res) {
   if(role === 'patient'){
 	  expectedStructure = '{role:String, name: String, email: String, password: String, gender: String, age: String, height: String, weight:String }';
 	}
+  // IF DOCTOR
   else if (role === 'doctor'){
 	  expectedStructure = '{role:String, name: String, email: String, password: String, hospital: String, specialty: String}';
   }
@@ -47,11 +49,21 @@ app.post('/user/create', function (req,res) {
       console.log(idCreated + 'hola');
   		res.send(status);
       //CREATE PATIENT
-      patientManager.create(userCreate, idCreated, (status, errors) => {
-        if(errors.length == 0){
-          res.send(status); //Como hacer que esto tambien aparezca
-        }
-      });
+      if(userCreate.role == 'patient'){
+        patientManager.create(userCreate, idCreated, (status, errors) => {
+          if(errors.length == 0){
+            res.send(status); //Como hacer que esto tambien aparezca
+          }
+        });
+      //CREATE DOCTOR
+      }else if(userCreate.role == 'doctor'){
+        doctorManager.create(userCreate, idCreated, (status, errors) => {
+          if(errors.length == 0){
+            console.log('Doctor Created');
+            res.send(status); //Como hacer que esto tambien aparezca
+          }
+        });
+      }
   	}else{
   		res.status(400).json(errors)
   	}

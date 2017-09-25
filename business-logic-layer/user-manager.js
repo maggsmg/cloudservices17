@@ -5,13 +5,7 @@ exports.create = function(user, callback){
 
 	userValidator.validate(user, function(user, errors){
 		if(errors.length == 0){
-
-			if(user.role === 'patient'){
-				userRepository.addPatient(user, callback);
-			}
-			else{
-				userRepository.addDoctor(user,callback);
-			}
+			userRepository.addUser(user, callback);
 		}else{
 			callback(null, errors)
 		}
