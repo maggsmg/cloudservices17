@@ -24,13 +24,24 @@ exports.addDoctor = function(userCreate, idCreated, callback){
 	  });
 }
 
+exports.addRegister = function(register, patientId, doctorId, callback){
+  const errors =[];
 
-exports.getPatient = function(id, callback){
+  var query_string = "INSERT INTO doctorRegister (patient_id, doctor_id, weight_control, prescription) VALUES (" + "'" + patientId + "','" + doctorId + "','" + register.weight_control + "','" + register.prescription + "');"
+  //console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+    if (err) throw err;
+    callback('Register Created', errors);
+  });
+
+}
+
+exports.getDoctor = function(id, callback){
   const errors = [];
 
 	//con.connect(function(err) {
 		//if (err) throw err;
-		con.query("SELECT name, email FROM users WHERE (id =" + id +")", function (err, result, fields) {
+		con.query("SELECT * FROM users INNER JOIN doctors ON users.id = doctors.user_id WHERE user_id =" + id, function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);
     		callback(result,errors);
@@ -38,7 +49,13 @@ exports.getPatient = function(id, callback){
 	//});
 }
 
-// exports.getAll = function(callback){
-// 	const query = `SELECT id, username, password FROM accounts ORDER BY id`
-// 	db.getMany(query, {}, callback)
-// }
+exports.getAllDoctors = function(callback){
+  const errors = [];
+  var query_string = "SELECT * FROM users INNER JOIN doctors ON users.id = doctors.user_id"
+  console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      callback(result,errors);
+  });
+
+}

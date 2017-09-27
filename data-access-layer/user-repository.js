@@ -25,12 +25,12 @@ exports.addUser = function(user, callback){
 }
 
 
-exports.getPatient = function(id, callback){
+exports.getUserRole = function(id, callback){
   const errors = [];
 
 	//con.connect(function(err) {
 		//if (err) throw err;
-		con.query("SELECT name, email FROM users WHERE (id =" + id +")", function (err, result, fields) {
+		con.query("SELECT role FROM users WHERE id =" + id, function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);
     		callback(result,errors);

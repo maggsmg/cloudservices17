@@ -13,8 +13,18 @@ exports.create = function(userCreate, idCreated, callback){
 
 }
 
-// exports.retrieve = function(id, callback){
-// 	//console.log('entro a la funcion')
-// 	userRepository.getPatient(id, callback);
-// 	//callback(null,errors);
-// }
+exports.createRegister = function (register, patientId, callback) {
+
+	patientRepository.addRegister(register, patientId, callback);
+}
+
+exports.allInfo = function(id, callback){
+	//console.log('entro a la funcion')
+	patientRepository.getPatient(id, callback);
+	//callback(null,errors);
+}
+
+exports.allPatients = function(callback){
+
+	patientRepository.getAllPatients(callback);
+}

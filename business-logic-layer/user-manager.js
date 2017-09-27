@@ -13,8 +13,14 @@ exports.create = function(user, callback){
 
 }
 
-exports.retrieve = function(id, callback){
+exports.role = function(id, callback){
 	//console.log('entro a la funcion')
-	userRepository.getPatient(id, callback);
+	userRepository.getUserRole(id, callback);
 	//callback(null,errors);
 }
+
+// exports.allPatients = function(id, callback){
+// 	//console.log('entro a la funcion')
+// 	userRepository.getAllPatients(callback);
+// 	//callback(null,errors);
+// }

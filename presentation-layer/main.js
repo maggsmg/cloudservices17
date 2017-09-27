@@ -19,6 +19,7 @@ app.get('/', function (req, res) {
    res.send('Welcome!');
 })
 
+//__________POSTS___________
 
 //____CREATE NEW USER________
 app.post('/user/create', function (req,res) {
@@ -74,29 +75,96 @@ app.post('/user/create', function (req,res) {
 
 });
 
-app.get('/user/info/:id', function (req, res) {
+app.post('/user/newPatientRegister/:id', function (req,res) {
+  var patientId = req.params.id;
+  const register = req.body;
+
+  patientManager.createRegister(register, patientId, (status, errors) =>{
+    if(errors.length == 0){
+      console.log('Patient Register Created');
+      res.send(status); //Como hacer que esto tambien aparezca
+    }
+
+  });
+
+
+});
+
+app.post('/user/newPatientRegister/:id', function (req,res) {
+  var patientId = req.params.id;
+  const register = req.body;
+
+  patientManager.createRegister(register, patientId, (status, errors) =>{
+    if(errors.length == 0){
+      console.log('Patient Register Created');
+      res.send(status); //Como hacer que esto tambien aparezca
+    }
+
+  });
+
+
+});
+
+app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
+  var patientId = req.params.patientId;
+  var doctorId = req.params.doctorId;
+  const register = req.body;
+
+  doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
+    if(errors.length == 0){
+      console.log('Doctor Register Created for patient:' + patientId);
+      res.send(status); //Como hacer que esto tambien aparezca
+    }
+
+  });
+
+
+});
+
+//__________GETS___________
+app.get('/user/:id', function (req, res) {
 	var id = req.params.id;
 
-	//var user_info = getUserInfo(id);
-
-  userManager.retrieve(id, function(userInfo, errors){
+  userManager.role(id, function(userInfo, errors){
     if(errors.length == 0){
+      //console.log('yallegue');
+      var role = userInfo[0].role;
+      //console.log(role);
+      if(role == 'patient'){
+        patientManager.allInfo(id, (patientInfo, errors) =>{
+          //console.log(patientInfo);
+        });
+      }
+      else if(role == 'doctor'){
+        doctorManager.allInfo(id, (doctorInfo, errors) =>{
+          //console.log(doctorInfo);
+        });
+      }
       res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
       res.status(400).json(errors)
     }
-  })
-  console.log('sopas');
-  //res.send();
-
-  // console.log(user_info);
-  // res.send(user_info);
+  });
 
 });
 
-app.post('/user/newRegister', function (req,res) {
-  const registerCreate = req.body;
-  console.log(registerCreate);
+app.get('/patients' , (req, res)=>{
+  //tengo que meter un validator aqui o un typeCheck?
+
+  patientManager.allPatients( (allPatients, errors) =>{
+    //console.log(typeof allPatients); Para saber que tipo de dato es
+    console.log(allPatients); //Lo debo dejar aqui?
+  })
+
+});
+
+app.get('/doctors' , (req, res)=>{
+  //tengo que meter un validator aqui o un typeCheck?
+
+  doctorManager.allDoctors( (allDoctors, errors) =>{
+    //console.log(typeof allPatients); Para saber que tipo de dato es
+    console.log(allDoctors); //Lo debo dejar aqui?
+  })
 
 });
 

@@ -33,13 +33,22 @@ exports.addPatient = function(userCreate, idCreated, callback){
 	 //callback('SUCCESS', errors);
 }
 
+exports.addRegister = function(register, patientId, callback){
+  const errors =[];
+
+  var query_string = "INSERT INTO patientRegister (patient_id, sugar_level, blood_pressure, insulin_intake, foot_pic) VALUES (" + "'" + patientId + "','" + register.sugar_level + "','" + register.blood_pressure + "','" + register.insulin_intake + "','" + register.foot_pic + "');"
+  //console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+    if (err) throw err;
+    callback('Register Created', errors);
+  });
+
+}
 
 exports.getPatient = function(id, callback){
   const errors = [];
-
-	//con.connect(function(err) {
-		//if (err) throw err;
-		con.query("SELECT name, email FROM users WHERE (id =" + id +")", function (err, result, fields) {
+    //falta quitar password y otros valores que no son relevantes en el get.
+		con.query("SELECT * FROM users INNER JOIN patients ON users.id = patients.user_id WHERE user_id =" + id, function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);
     		callback(result,errors);
@@ -47,7 +56,13 @@ exports.getPatient = function(id, callback){
 	//});
 }
 
-// exports.getAll = function(callback){
-// 	const query = `SELECT id, username, password FROM accounts ORDER BY id`
-// 	db.getMany(query, {}, callback)
-// }
+exports.getAllPatients = function(callback){
+  const errors = [];
+  var query_string = "SELECT * FROM users INNER JOIN patients ON users.id = patients.user_id"
+  console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      callback(result,errors);
+  });
+
+}
