@@ -28,3 +28,8 @@ exports.allDoctors= function(callback){
 
 	doctorRepository.getAllDoctors(callback);
 }
+
+exports.oneDoctorPatient = function(patientId, doctorId, callback){
+
+	doctorRepository.getThis(patientId, doctorId, callback);
+}

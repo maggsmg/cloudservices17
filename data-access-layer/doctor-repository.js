@@ -59,3 +59,14 @@ exports.getAllDoctors = function(callback){
   });
 
 }
+
+exports.getThis = function(patientId, doctorId, callback){
+  const errors = [];
+  var query_string = "SELECT * FROM doctorRegister WHERE patient_id =" + patientId + " AND doctor_id =" + doctorId + ";"
+  console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      callback(result,errors);
+  });
+
+}

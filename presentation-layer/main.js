@@ -168,6 +168,24 @@ app.get('/doctors' , (req, res)=>{
 
 });
 
+app.get('/patientRegisters/:id', (req, res) =>{
+  var patientId = req.params.id;
+  patientManager.onePatient(patientId, (allRegisters, errors) =>{
+    console.log(allRegisters);
+    res.send('SUCCESS');
+  });
+});
+
+app.get('/doctorRegister/:patientId/:doctorId', (req, res) =>{
+  var patientId = req.params.patientId;
+  var doctorId = req.params.doctorId;
+
+  doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
+    console.log(allRegisters);
+    res.send('SUCCESS');
+  })
+})
+
 
 app.listen(8000 , () => {
   console.log('Server listening on port 8000');
