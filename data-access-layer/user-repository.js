@@ -38,6 +38,19 @@ exports.getUserRole = function(id, callback){
 	//});
 }
 
+exports.getPwd = function(email, callback){
+  const errors = [];
+
+	//con.connect(function(err) {
+		//if (err) throw err;
+		con.query("SELECT password FROM users WHERE email =" + "'" + email + "'", function (err, result, fields) {
+    		if (err) throw err;
+    		console.log(result);
+    		callback(result,errors);
+		});
+	//});
+}
+
 // exports.getAll = function(callback){
 // 	const query = `SELECT id, username, password FROM accounts ORDER BY id`
 // 	db.getMany(query, {}, callback)

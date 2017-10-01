@@ -19,6 +19,10 @@ exports.role = function(id, callback){
 	//callback(null,errors);
 }
 
+exports.jwtoken = function(email, callback){
+	userRepository.getPwd(email, callback);
+}
+
 // exports.allPatients = function(id, callback){
 // 	//console.log('entro a la funcion')
 // 	userRepository.getAllPatients(callback);

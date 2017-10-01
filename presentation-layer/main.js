@@ -3,7 +3,10 @@ var http = require('http');
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
+var jwt = require('jsonwebtoken');
+var config = require('../config');
 // const bodyParser = require('body-parser');
+
 const typeCheck = require('type-check').typeCheck;
 const userManager = require('../business-logic-layer/user-manager');
 const patientManager = require('../business-logic-layer/patient-manager');
@@ -11,6 +14,10 @@ const doctorManager = require('../business-logic-layer/doctor-manager');
 
 var app = express();
 var server = http.createServer(app);
+
+var port = process.env.PORT || 8000; // used to create, sign, and verify tokens
+app.set('superSecret', config.secret); // secret variable
+
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
 
@@ -20,6 +27,48 @@ app.get('/', function (req, res) {
 })
 
 //__________POSTS___________
+app.post('/authenticate', function(req, res) {
+
+  //var token = jwt.sign("user", app.get('superSecret'), {
+    //expiresIn: 1440 // expires in 24 hours
+  //});
+
+  var login = req.body;
+
+  userManager.jwtoken(login.email, function(result, errors){
+    if(errors.length == 0){
+      //console.log('yallegue');
+      //res.send(result) //no se si aqui deba ir res.json o res.send
+      if (result.length != 1) {
+        res.json({ success: false, message: 'Authentication failed. User not found.' });
+      }else if (result){
+            // check if password matches
+            console.log(result[0].password);
+            console.log(req.body.password);
+        if (result[0].password != req.body.password) {
+          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        }else{
+          console.log('Mi novio me habla feo y me enoja y el también por que yo me enojo');
+          // if user is found and password is right
+          // create a token
+          var token = jwt.sign({
+            email: login.email,
+            password: result[0].password
+          }, 'secret', { expiresIn: 60 * 60 });
+
+          res.json({
+            success: true,
+            message: 'Enjoy your token!',
+            token: token
+          });
+        }
+      }
+    }else{
+      res.status(400).json(errors)
+    }
+  });
+
+});
 
 //____CREATE NEW USER________
 app.post('/user/create', function (req,res) {
@@ -53,7 +102,15 @@ app.post('/user/create', function (req,res) {
       if(userCreate.role == 'patient'){
         patientManager.create(userCreate, idCreated, (status, errors) => {
           if(errors.length == 0){
-            res.send(status); //Como hacer que esto tambien aparezca
+            var token = jwt.sign(userCreate, app.get('superSecret'), {
+              expiresIn: 1440 // expires in 24 hours
+            });
+            res.json({
+              success: true,
+              message: 'Enjoy your token!',
+              token: token
+            });
+            //res.send(status); //Como hacer que esto tambien aparezca
           }
         });
       //CREATE DOCTOR
