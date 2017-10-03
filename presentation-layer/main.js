@@ -21,7 +21,7 @@ app.set('superSecret', config.secret); // secret variable
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
 
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   var now = new Date().toString();
   var url = req.url;
   var log = `${now}: ${req.method} ${req.url}`;
@@ -64,7 +64,7 @@ app.use((req, res, next) => {
     next();
   }
 
-});
+});*/
 
 
 app.get('/', function (req, res) {
@@ -74,17 +74,10 @@ app.get('/', function (req, res) {
 
 //__________POSTS___________
 app.post('/authenticate', function(req, res) {
-
-  //var token = jwt.sign("user", app.get('superSecret'), {
-    //expiresIn: 1440 // expires in 24 hours
-  //});
-
   var login = req.body;
 
   userManager.jwtoken(login.email, function(result, errors){
     if(errors.length == 0){
-      //console.log('yallegue');
-      //res.send(result) //no se si aqui deba ir res.json o res.send
       if (result.length != 1) {
         res.json({ success: false, message: 'Authentication failed. User not found.' });
       }else if (result){
@@ -94,7 +87,7 @@ app.post('/authenticate', function(req, res) {
         if (result[0].password != req.body.password) {
           res.json({ success: false, message: 'Authentication failed. Wrong password.' });
         }else{
-          console.log('Mi novio me habla feo y me enoja y el también por que yo me enojo');
+          //console.log('Mi novio me habla feo y me enoja y el también por que yo me enojo');
           // if user is found and password is right
           // create a token
           var token = jwt.sign({
@@ -193,21 +186,6 @@ app.post('/user/newPatientRegister/:id', function (req,res) {
 
 });
 
-app.post('/user/newPatientRegister/:id', function (req,res) {
-  var patientId = req.params.id;
-  const register = req.body;
-
-  patientManager.createRegister(register, patientId, (status, errors) =>{
-    if(errors.length == 0){
-      console.log('Patient Register Created');
-      res.send(status); //Como hacer que esto tambien aparezca
-    }
-
-  });
-
-
-});
-
 app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
@@ -223,6 +201,23 @@ app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
 
 
 });
+
+//__________PUTS___________
+app.patch('/user/update', function (req, res) {
+  var userpwd = req.body;
+
+  userManager.update(userpwd.email, userpwd.password, function(update, errors){
+    if(errors.length == 0){
+      //var role = userInfo[0].role;
+      console.log(update);
+
+      res.send(update) //no se si aqui deba ir res.json o res.send
+    }else{
+      res.status(400).json(errors)
+    }
+  });
+});
+
 
 //__________GETS___________
 app.get('/user/:id', function (req, res) {
@@ -288,6 +283,16 @@ app.get('/doctorRegister/:patientId/:doctorId', (req, res) =>{
     res.send('SUCCESS');
   })
 })
+
+//__________DELETES___________
+
+app.delete('/user/delete/:id', function (req, res){
+  var id = req.params.id;
+  userManager.delete(id, function(status, errors){
+    console.log(status);
+    res.send(status);
+  });
+});
 
 
 app.listen(8000 , () => {

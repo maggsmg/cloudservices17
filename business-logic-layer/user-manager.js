@@ -23,6 +23,14 @@ exports.jwtoken = function(email, callback){
 	userRepository.getPwd(email, callback);
 }
 
+exports.update = function(email, pwd, callback){
+	userRepository.updatePwd(email, pwd, callback);
+}
+
+exports.delete = function(id, callback){
+	userRepository.deleteUser(id, callback);
+}
+
 // exports.allPatients = function(id, callback){
 // 	//console.log('entro a la funcion')
 // 	userRepository.getAllPatients(callback);

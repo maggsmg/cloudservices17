@@ -43,6 +43,7 @@ exports.getPwd = function(email, callback){
 
 	//con.connect(function(err) {
 		//if (err) throw err;
+
 		con.query("SELECT password FROM users WHERE email =" + "'" + email + "'", function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);
@@ -51,6 +52,31 @@ exports.getPwd = function(email, callback){
 	//});
 }
 
+exports.updatePwd = function(email, pwd, callback){
+  const errors = [];
+
+	//con.connect(function(err) {
+		//if (err) throw err;
+    var query_string = "UPDATE users SET password =" + "'" + pwd + "' WHERE email="+ "'" + email + "';"
+    console.log(query_string);
+		con.query(query_string, function (err, result, fields) {
+    		if (err) throw err;
+    		console.log(result);
+    		callback(result,errors);
+		});
+}
+
+exports.deleteUser = function(id, callback){
+  const errors = [];
+
+    var query_string = "DELETE FROM users WHERE id =" + "'" + id +  "';"
+    console.log(query_string);
+		con.query(query_string, function (err, result, fields) {
+    		if (err) throw err;
+    		console.log(result);
+    		callback('SUCCESS',errors);
+		});
+}
 // exports.getAll = function(callback){
 // 	const query = `SELECT id, username, password FROM accounts ORDER BY id`
 // 	db.getMany(query, {}, callback)
