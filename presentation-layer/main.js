@@ -1,42 +1,44 @@
 
-var http = require('http');
-var path = require('path');
-var express = require('express');
-var bodyParser = require('body-parser');
-var jwt = require('jsonwebtoken');
-var config = require('../config');
-// const bodyParser = require('body-parser');
-
+const http = require('http');
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const typeCheck = require('type-check').typeCheck;
 const userManager = require('../business-logic-layer/user-manager');
-const patientManager = require('../business-logic-layer/patient-manager');
-const doctorManager = require('../business-logic-layer/doctor-manager');
+const patientManager  = require('../business-logic-layer/patient-manager');
+const doctorManager   = require('../business-logic-layer/doctor-manager');
+const config = require('../config/config');
+const passport = require('passport');
+const configurePassport = require('../config/passport');
+const app = express();
+const server = http.createServer(app);
+const port = process.env.PORT || 8000; // used to create, sign, and verify tokens
 
-var app = express();
-var server = http.createServer(app);
-
-var port = process.env.PORT || 8000; // used to create, sign, and verify tokens
 app.set('superSecret', config.secret); // secret variable
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
+app.use(passport.initialize());
+app.use(passport.session());
 
-/*app.use((req, res, next) => {
+// ------------ MIDDLEWARE ---------------
+app.use((req, res, next) => {
   var now = new Date().toString();
   var url = req.url;
-  var log = `${now}: ${req.method} ${req.url}`;
-
+  var pathname = req._parsedUrl.pathname;
+  var log = `${pathname}: ${req.method}`;
   console.log(log);
 
-  if (url != '/authenticate' ){
-
-    //fs.appendFile('server.log', log + '\n');
+  //The following routes are ignored by middleware
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354') {
+    next();
+  }
+  else{
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
     // decode token
     if (token) {
-
       // verifies secret and checks exp
       jwt.verify(token, app.get('superSecret'), function(err, decoded) {
         if (err) {
@@ -47,66 +49,102 @@ app.use(bodyParser.urlencoded({ extended: true })); //
           next();
         }
       });
-
     } else {
-
       // if there is no token
       // return an error
       return res.status(403).send({
           success: false,
           message: 'No token provided.'
       });
-
     }
-
-  }else{
-    //Pages Not Required
-    next();
   }
+});
 
-});*/
-
+// ---------------------- ROUTES ---------------------
 
 app.get('/', function (req, res) {
    console.log("Home");
    res.send('Welcome!');
+});
+
+app.get('/login', function (req, res) {
+   console.log("login");
+   res.send('Login!');
+});
+
+app.get('/profile', function (req, res) {
+   console.log("profile");
+   res.send('Logged in by Google Auth2.0!');
+});
+
+app.get('/getGoogleUser/:id', function(req,res){
+  userManager.findOneGoogleUser( req.params.id , function(err, user) {
+      if (err)
+        res.send(err.message)
+      if (user)
+        res.send(user)
+      else
+        res.send('User Not Found');
+  });
 })
 
-//__________POSTS___________
-app.post('/authenticate', function(req, res) {
-  var login = req.body;
-
-  userManager.jwtoken(login.email, function(result, errors){
-    if(errors.length == 0){
-      if (result.length != 1) {
-        res.json({ success: false, message: 'Authentication failed. User not found.' });
-      }else if (result){
-            // check if password matches
-            console.log(result[0].password);
-            console.log(req.body.password);
-        if (result[0].password != req.body.password) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-        }else{
-          //console.log('Mi novio me habla feo y me enoja y el también por que yo me enojo');
-          // if user is found and password is right
-          // create a token
-          var token = jwt.sign({
-            email: login.email,
-            password: result[0].password
-          }, app.get('superSecret'), { expiresIn: 60 * 60 });
-
-          res.json({
-            success: true,
-            message: 'Enjoy your token!',
-            token: token
-          });
-        }
-      }
+app.get('/createGoogleUser', function(req,res){
+  userToSave = {
+    'name'      :   'Miguel Miramontes', 
+    'role'      :   'patient',
+    'email'     :   'migmira@hotmfail1.com',
+    'password'  :   '',
+    'google_id' :   4,
+    'token'     :   'token'
+  }
+  userManager.createGoogleUser(userToSave, function(userCreated, err){
+    if(err.length == 0){
+      console.log('Usuario Creado:');
+      console.log(userCreated);
+      res.send('Usuario '+ userCreated.name  + ' Creado');
     }else{
       res.status(400).json(errors)
     }
   });
+});
 
+app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+// the callback after google has authenticated the user
+app.get('/auth/google/callback',
+          passport.authenticate('google', {
+                  successRedirect : '/profile',
+                  failureRedirect : '/login'
+}));
+
+
+//__________POSTS___________
+app.post('/authenticate', function(req, res) {
+  var login = req.body;
+  userManager.jwtoken(login.email, function(user, err){
+
+    if (err) throw err;
+    
+    console.log(user);
+
+    if (!user.found )
+      res.json({ success: false, message: 'Authentication failed. User not found.' });
+
+    if (user.passwd != req.body.password )
+      res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+
+    var token = jwt.sign({
+      email: login.email,
+      password: user.passwd
+    }, app.get('superSecret'), { expiresIn: 60 * 60 });
+
+    res.json({
+      success: true,
+      message: 'Enjoy your token!',
+      token: token
+    });
+
+  });
 });
 
 //____CREATE NEW USER________
@@ -133,42 +171,11 @@ app.post('/user/create', function (req,res) {
   		return
   }
 
-  userManager.create(userCreate, function(idCreated,status, errors){
-    if(errors.length == 0){
-      console.log(idCreated + 'hola');
-  		res.send(status);
-      //CREATE PATIENT
-      if(userCreate.role == 'patient'){
-        patientManager.create(userCreate, idCreated, (status, errors) => {
-          if(errors.length == 0){
-            var token = jwt.sign(userCreate, app.get('superSecret'), {
-              expiresIn: 1440 // expires in 24 hours
-            });
-            res.json({
-              success: true,
-              message: 'Enjoy your token!',
-              token: token
-            });
-            //res.send(status); //Como hacer que esto tambien aparezca
-          }
-        });
-      //CREATE DOCTOR
-      }else if(userCreate.role == 'doctor'){
-        doctorManager.create(userCreate, idCreated, (status, errors) => {
-          if(errors.length == 0){
-            console.log('Doctor Created');
-            res.send(status); //Como hacer que esto tambien aparezca
-          }
-        });
-      }
-  	}else{
-  		res.status(400).json(errors)
-  	}
+  userManager.create(userCreate, function(status, err){
+    res.send(status);
 	})
 
   //res.send();
-
-
 });
 
 app.post('/user/newPatientRegister/:id', function (req,res) {
@@ -182,15 +189,12 @@ app.post('/user/newPatientRegister/:id', function (req,res) {
     }
 
   });
-
-
 });
 
 app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   const register = req.body;
-
   doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
     if(errors.length == 0){
       console.log('Doctor Register Created for patient:' + patientId);
@@ -198,19 +202,15 @@ app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
     }
 
   });
-
-
 });
 
 //__________PUTS___________
 app.patch('/user/update', function (req, res) {
   var userpwd = req.body;
-
   userManager.update(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
       //var role = userInfo[0].role;
       console.log(update);
-
       res.send(update) //no se si aqui deba ir res.json o res.send
     }else{
       res.status(400).json(errors)
@@ -222,7 +222,6 @@ app.patch('/user/update', function (req, res) {
 //__________GETS___________
 app.get('/user/:id', function (req, res) {
 	var id = req.params.id;
-
   userManager.role(id, function(userInfo, errors){
     if(errors.length == 0){
       //console.log('yallegue');
@@ -243,7 +242,6 @@ app.get('/user/:id', function (req, res) {
       res.status(400).json(errors)
     }
   });
-
 });
 
 app.get('/patients' , (req, res)=>{
@@ -253,17 +251,14 @@ app.get('/patients' , (req, res)=>{
     //console.log(typeof allPatients); Para saber que tipo de dato es
     console.log(allPatients); //Lo debo dejar aqui?
   })
-
 });
 
 app.get('/doctors' , (req, res)=>{
   //tengo que meter un validator aqui o un typeCheck?
-
   doctorManager.allDoctors( (allDoctors, errors) =>{
     //console.log(typeof allPatients); Para saber que tipo de dato es
     console.log(allDoctors); //Lo debo dejar aqui?
   })
-
 });
 
 app.get('/patientRegisters/:id', (req, res) =>{
@@ -277,7 +272,6 @@ app.get('/patientRegisters/:id', (req, res) =>{
 app.get('/doctorRegister/:patientId/:doctorId', (req, res) =>{
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
-
   doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
     console.log(allRegisters);
     res.send('SUCCESS');
@@ -293,6 +287,7 @@ app.delete('/user/delete/:id', function (req, res){
     res.send(status);
   });
 });
+
 
 
 app.listen(8000 , () => {
