@@ -1,16 +1,25 @@
 {
-  "name": "chat-example",/Users/MagdalenaMartinez/Desktop/cloudservices17/package.json
-  "version": "0.0.0",
-  "description": "A chat example to showcase how to use `socket.io` with a static `express` server with `async` for control flow.",
-  "main": "server.js",
-  "repository": "",
-  "author": "Mostafa Eweda <mo.eweda@gmail.com>",
+  "name": "passport",
+  "version": "1.0.0",
+  "description": "This repository is mainly to develop the project work for the Internet and Cloud Services Course.",
+  "main": "dbconnection.js",
   "dependencies": {
-    "async": "~0.2.8",
     "body-parser": "^1.18.2",
-    "express": "~3.2.4",
     "jsonwebtoken": "^8.0.1",
-    "socket.io": "~0.9.14",
     "type-check": "^0.3.2"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maggsmg/cloudservices17.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maggsmg/cloudservices17/issues"
+  },
+  "homepage": "https://github.com/maggsmg/cloudservices17#readme"
 }

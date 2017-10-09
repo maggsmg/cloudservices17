@@ -21,8 +21,7 @@ exports.addPatient = function(userCreate, idCreated, callback){
 
 exports.addRegister = function(register, patientId, callback){
   const errors =[];
-
-  var query_string = "INSERT INTO patientRegister (date, patient_id, sugar_level, blood_pressure, insulin_intake, foot_pic) VALUES (" + "'" + now() + "','" + patientId + "','" + register.sugar_level + "','" + register.blood_pressure + "','" + register.insulin_intake + "','" + register.foot_pic + "');"
+  var query_string = "INSERT INTO patientRegister (date, patient_id, sugar_level, blood_pressure, insulin_intake, foot_pic) VALUES ( NOW()," + "'" + patientId + "','" + register.sugar_level + "','" + register.blood_pressure + "','" + register.insulin_intake + "','" + register.foot_pic + "');"
   //console.log(query_string);
   con.query(query_string, function (err, result, fields) {
     if (err) throw err;
