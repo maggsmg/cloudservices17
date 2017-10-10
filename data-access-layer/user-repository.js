@@ -10,10 +10,10 @@ con.connect(function(err) {
   if (err) throw err;
 });
 
-exports.addUser = function(user, callback){
+exports.addUser = function(user, hash, callback){
 	const errors = [];
   var inserted_id;
-  var query_string = "INSERT INTO users (role, name, email, password) VALUES (" + "'" + user.role + "','" + user.name + "','" + user.email + "','" + user.password + "');"
+  var query_string = "INSERT INTO users (role, name, email, password) VALUES (" + "'" + user.role + "','" + user.name + "','" + user.email + "','" + hash + "');"
   // console.log(query_string);
   con.query(query_string, function (err, result, fields) {
 	   if (err) throw err;

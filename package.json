@@ -4,12 +4,19 @@
   "description": "This repository is mainly to develop the project work for the Internet and Cloud Services Course.",
   "main": "dbconnection.js",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "jsonwebtoken": "^8.0.1",
-    "type-check": "^0.3.2"
+    "type-check": "^0.3.2",
+    "express": "3.2.6",
+    "async": "0.2.10",
+    "mysql": "2.15.0",
+    "passport": "0.4.0",
+    "passport-google-oauth": "1.0.0"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node presentation-layer/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

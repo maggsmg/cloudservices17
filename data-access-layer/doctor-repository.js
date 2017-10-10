@@ -22,7 +22,7 @@ exports.addDoctor = function(userCreate, idCreated, callback){
 exports.addRegister = function(register, patientId, doctorId, callback){
   const errors =[];
 
-  var query_string = "INSERT INTO doctorRegister (patient_id, doctor_id, weight_control, prescription) VALUES (" + "'" + patientId + "','" + doctorId + "','" + register.weight_control + "','" + register.prescription + "');"
+  var query_string = "INSERT INTO doctorRegister (date, patient_id, doctor_id, weight_control, prescription) VALUES ( NOW()," + "'" + patientId + "','" + doctorId + "','" + register.weight_control + "','" + register.prescription + "');"
   //console.log(query_string);
   con.query(query_string, function (err, result, fields) {
     if (err) throw err;

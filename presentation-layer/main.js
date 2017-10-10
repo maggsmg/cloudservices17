@@ -31,7 +31,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/create/test') {
     next();
   }
   else{
@@ -90,7 +90,7 @@ app.get('/getGoogleUser/:id', function(req,res){
 
 app.get('/createGoogleUser', function(req,res){
   userToSave = {
-    'name'      :   'Miguel Miramontes', 
+    'name'      :   'Miguel Miramontes',
     'role'      :   'patient',
     'email'     :   'migmira@hotmfail1.com',
     'password'  :   '',
@@ -124,7 +124,7 @@ app.post('/authenticate', function(req, res) {
   userManager.jwtoken(login.email, function(user, err){
 
     if (err) throw err;
-    
+
     console.log(user);
 
     if (!user.found )
@@ -288,6 +288,15 @@ app.delete('/user/delete/:id', function (req, res){
   });
 });
 
+app.post('/user/create/test', function (req,res) {
+  const userCreate = req.body;
+
+  userManager.createtest(userCreate, function(status, err){
+    res.send(status);
+	})
+
+  //res.send();
+});
 
 
 app.listen(8000 , () => {
