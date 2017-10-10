@@ -14,6 +14,8 @@ const configurePassport = require('../config/passport');
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8000; // used to create, sign, and verify tokens
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 app.set('superSecret', config.secret); // secret variable
 
@@ -31,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/create/test') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/delete/1') {
     next();
   }
   else{
@@ -130,19 +132,28 @@ app.post('/authenticate', function(req, res) {
     if (!user.found )
       res.json({ success: false, message: 'Authentication failed. User not found.' });
 
-    if (user.passwd != req.body.password )
-      res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+      userManager.verifyPwd(user.passwd, login.password, function(err,result){
+        if (err) throw err;
 
-    var token = jwt.sign({
-      email: login.email,
-      password: user.passwd
-    }, app.get('superSecret'), { expiresIn: 60 * 60 });
+        if (result){
+    		    var token = jwt.sign({
+    			  email: login.email,
+    			  password: user.passwd
+    			}, app.get('superSecret'), { expiresIn: 60 * 60 });
 
-    res.json({
-      success: true,
-      message: 'Enjoy your token!',
-      token: token
-    });
+    			res.json({
+    			  success: true,
+    			  message: 'Enjoy your token!',
+    			  token: token
+    			});
+    		}else{
+    		  	res.json({
+    			  success: false,
+    			  message: 'Authentication failed. Wrong password.',
+    			  token: token
+    			});
+    		}
+      });
 
   });
 });
@@ -171,7 +182,7 @@ app.post('/user/create', function (req,res) {
   		return
   }
 
-  userManager.create(userCreate, function(status, err){
+  userManager.create(userCreate, function(err, status){
     res.send(status);
 	})
 
@@ -206,6 +217,19 @@ app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
 
 //__________PUTS___________
 app.patch('/user/update', function (req, res) {
+  var userpwd = req.body;
+  userManager.update(userpwd.email, userpwd.password, function(update, errors){
+    if(errors.length == 0){
+      //var role = userInfo[0].role;
+      console.log(update);
+      res.send(update) //no se si aqui deba ir res.json o res.send
+    }else{
+      res.status(400).json(errors)
+    }
+  });
+});
+
+app.patch('/user/update/patientRegister', function (req, res) {
   var userpwd = req.body;
   userManager.update(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
@@ -286,16 +310,6 @@ app.delete('/user/delete/:id', function (req, res){
     console.log(status);
     res.send(status);
   });
-});
-
-app.post('/user/create/test', function (req,res) {
-  const userCreate = req.body;
-
-  userManager.createtest(userCreate, function(status, err){
-    res.send(status);
-	})
-
-  //res.send();
 });
 
 

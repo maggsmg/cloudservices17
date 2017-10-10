@@ -61,3 +61,15 @@ exports.getThisPatient = function(id, callback){
   });
 
 }
+
+exports.delete = function(userId, callback){
+  const errors = [];
+
+    var query_string = "DELETE FROM patients WHERE user_id =" + "'" + userId +  "';"
+    console.log(query_string);
+    con.query(query_string, function (err, result, fields) {
+        if (err) throw err;
+        console.log(result);
+        callback('SUCCESS',errors);
+    });
+}

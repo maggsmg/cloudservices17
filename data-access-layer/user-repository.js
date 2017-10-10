@@ -53,6 +53,18 @@ exports.getUserByEmail = function(email, callback){
   });
 }
 
+exports.getUserById = function(id, callback){
+  var query_string = "SELECT id, role, name, email FROM users WHERE id ='" + id + "';" ;
+  // console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      if (result.length == 1)
+        callback(result[0],err);
+      else
+        callback(null, err);
+  });
+}
+
 exports.getUserRole = function(id, callback){
   const errors = [];
 

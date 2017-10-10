@@ -1,9 +1,13 @@
 const userValidator 	= require('./user-validator')
 const userRepository 	= require('../data-access-layer/user-repository')
 const patientManager  = require('./patient-manager');
+const patientRepository = require('../data-access-layer/patient-repository')
 const doctorManager   = require('./doctor-manager');
+const doctorRepository = require('../data-access-layer/doctor-repository')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const express = require('express');
+const http = require('http');
 
 exports.create = function(user, callback){
 
@@ -71,24 +75,30 @@ exports.update = function(email, pwd, callback){
 }
 
 exports.delete = function(id, callback){
-	userRepository.deleteUser(id, callback);
+	//userRepository.deleteUser(id, callback);
+	userRepository.getUserById(id, function(user_exists,err2){
+		if (user_exists == null){
+			callback ('User does not exist', err2)
+		}
+		else{
+			userRepository.deleteUser(id, callback);
+			if(user_exists.role == 'patient'){
+				patientRepository.delete(id, callback);
+			}
+			else{
+				doctorRepository.delete(id,callback);
+			}
+
+		 }
+
+	})
 }
 
-exports.createtest = function(user, callback){
-	myPlaintextPassword = user.password;
-	const saltRounds = 10;
-	bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
-  console.log(hash);// Store hash in your password DB.
-	});
+exports.verifyPwd = function(userPwd, inputPwd, callback){
+		bcrypt.compare(inputPwd, userPwd, function(err, result) {
+			// res == true
+			//if (err) throw err;
 
-	bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
-    // res == true
-		console.log(res);
-	});
+			callback(err, result);
+		});
 }
-
-// exports.allPatients = function(id, callback){
-// 	//console.log('entro a la funcion')
-// 	userRepository.getAllPatients(callback);
-// 	//callback(null,errors);
-// }
