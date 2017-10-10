@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/delete/1') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/updatePwd') {
     next();
   }
   else{
@@ -127,8 +127,6 @@ app.post('/authenticate', function(req, res) {
 
     if (err) throw err;
 
-    console.log(user);
-
     if (!user.found )
       res.json({ success: false, message: 'Authentication failed. User not found.' });
 
@@ -216,26 +214,13 @@ app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
 });
 
 //__________PUTS___________
-app.patch('/user/update', function (req, res) {
+app.patch('/user/updatePwd', function (req, res) {
   var userpwd = req.body;
-  userManager.update(userpwd.email, userpwd.password, function(update, errors){
+  userManager.updatePwd(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
       //var role = userInfo[0].role;
       console.log(update);
-      res.send(update) //no se si aqui deba ir res.json o res.send
-    }else{
-      res.status(400).json(errors)
-    }
-  });
-});
-
-app.patch('/user/update/patientRegister', function (req, res) {
-  var userpwd = req.body;
-  userManager.update(userpwd.email, userpwd.password, function(update, errors){
-    if(errors.length == 0){
-      //var role = userInfo[0].role;
-      console.log(update);
-      res.send(update) //no se si aqui deba ir res.json o res.send
+      res.send('Password Updated') //no se si aqui deba ir res.json o res.send
     }else{
       res.status(400).json(errors)
     }

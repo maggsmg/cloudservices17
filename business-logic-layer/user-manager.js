@@ -70,8 +70,12 @@ exports.jwtoken = function(email, callback){
 	userRepository.getPwd(email, callback);
 }
 
-exports.update = function(email, pwd, callback){
-	userRepository.updatePwd(email, pwd, callback);
+exports.updatePwd = function(email, pwd, callback){
+
+	bcrypt.hash(pwd, saltRounds, function(err, hash) {
+		userRepository.updatePwd(email, hash, callback);
+	});
+	//userRepository.updatePwd(email, pwd, callback);
 }
 
 exports.delete = function(id, callback){
