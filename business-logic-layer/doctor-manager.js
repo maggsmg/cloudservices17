@@ -67,3 +67,7 @@ exports.oneDoctorPatient = function(patientId, doctorId, callback){
 	})
 	//doctorRepository.getThis(patientId, doctorId, callback);
 }
+
+exports.deleteRegister = function(registerId, callback){
+	doctorRepository.deleteRegister(registerId, callback);
+}

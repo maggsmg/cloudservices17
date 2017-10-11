@@ -50,3 +50,7 @@ exports.onePatient = function(patientId, callback){
 
 	});//patientRepository.getThisPatient(id, callback);
 }
+
+exports.deleteRegister = function(registerId, callback){
+	patientRepository.deleteRegister(registerId, callback);
+}

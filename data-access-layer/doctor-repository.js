@@ -90,3 +90,15 @@ exports.delete = function(userId, callback){
         callback('SUCCESS',errors);
     });
 }
+
+exports.deleteRegister = function(registerId, callback){
+  const errors = [];
+
+    var query_string = "DELETE FROM doctorRegister WHERE id =" + "'" + registerId +  "';"
+    console.log(query_string);
+    con.query(query_string, function (err, result, fields) {
+        if (err) throw err;
+        console.log(result);
+        callback('SUCCESS',errors);
+    });
+}

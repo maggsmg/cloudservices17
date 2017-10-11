@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/doctorRegister/3/5') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/registers/doctors/5') {
     next();
   }
   else{
@@ -187,7 +187,7 @@ app.post('/user/create', function (req,res) {
   //res.send();
 });
 
-app.post('/user/newPatientRegister/:patientId', function (req,res) {
+app.post('/registers/:patientId', function (req,res) {
   var patientId = req.params.patientId;
   const register = req.body;
 
@@ -200,7 +200,7 @@ app.post('/user/newPatientRegister/:patientId', function (req,res) {
   });
 });
 
-app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
+app.post('/registers/:patientId/:doctorId', function (req,res) {
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   const register = req.body;
@@ -266,7 +266,7 @@ app.get('/doctors' , (req, res)=>{
   })
 });
 
-app.get('/allPatientRegisters/:patientId', (req, res) =>{
+app.get('/registers/patients/:patientId', (req, res) =>{
   var patientId = req.params.patientId;
   patientManager.onePatient(patientId, (allRegisters, errors) =>{
     console.log(allRegisters);
@@ -274,7 +274,7 @@ app.get('/allPatientRegisters/:patientId', (req, res) =>{
   });
 });
 
-app.get('/doctorRegister/:patientId/:doctorId', (req, res) =>{
+app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
@@ -285,7 +285,7 @@ app.get('/doctorRegister/:patientId/:doctorId', (req, res) =>{
 
 //__________DELETES___________
 
-app.delete('/user/delete/:id', function (req, res){
+app.delete('/user/:id', function (req, res){
   var id = req.params.id;
   userManager.delete(id, function(status, errors){
     console.log(status);
@@ -293,6 +293,21 @@ app.delete('/user/delete/:id', function (req, res){
   });
 });
 
+app.delete('/registers/patients/:registerId', function (req, res){
+  var registerId = req.params.registerId;
+  patientManager.deleteRegister(registerId, function(status, errors){
+    console.log(status);
+    res.send(status);
+  });
+});
+
+app.delete('/registers/doctors/:registerId', function (req, res){
+  var registerId = req.params.registerId;
+  doctorManager.deleteRegister(registerId, function(status, errors){
+    console.log(status);
+    res.send(status);
+  });
+});
 
 app.listen(8000 , () => {
   console.log('Server listening on port 8000');
