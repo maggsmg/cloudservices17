@@ -20,8 +20,6 @@ app.set('superSecret', config.secret); // secret variable
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(express.cookieParser('secret'));
 app.use(express.cookieSession()); // Express cookie session middleware
