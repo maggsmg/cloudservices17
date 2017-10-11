@@ -106,7 +106,6 @@ exports.updatePwd = function(email, pwd, callback){
 	//con.connect(function(err) {
 		//if (err) throw err;
     var query_string = "UPDATE users SET password =" + "'" + pwd + "' WHERE email="+ "'" + email + "';"
-    console.log(query_string);
 		con.query(query_string, function (err, result, fields) {
     		if (err) throw err;
     		console.log(result);

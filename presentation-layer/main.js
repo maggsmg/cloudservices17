@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/7') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/registers/doctors/3/5') {
     next();
   }
   else{
@@ -194,7 +194,10 @@ app.post('/registers/:patientId', function (req,res) {
   patientManager.createRegister(register, patientId, (status, errors) =>{
     if(errors.length == 0){
       console.log('Patient Register Created');
-      res.send(status); //Como hacer que esto tambien aparezca
+      res.status(200).json([status]);
+    }
+    else{
+      res.status(400).json(["Please try again :("]);
     }
 
   });
@@ -206,20 +209,20 @@ app.post('/registers/:patientId/:doctorId', function (req,res) {
   const register = req.body;
   doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
     console.log('Doctor Register Created for patient:' + patientId);
-    res.send(status);
+    res.status(200).json([status]);
   });
+  res.status(400).json(["Please try again :("])
 });
 
-//__________PUTS___________
+//__________PATCHS___________
 app.patch('/user/updatePwd', function (req, res) {
   var userpwd = req.body;
   userManager.updatePwd(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
-      //var role = userInfo[0].role;
       console.log(update);
-      res.send('Password Updated') //no se si aqui deba ir res.json o res.send
+      res.status(200).json('Password Updated')
     }else{
-      res.status(400).json(errors)
+      res.status(400).json(errors);
     }
   });
 });
@@ -246,7 +249,7 @@ app.get('/user/:id', function (req, res) {
             'weight': patientInfo[0].weight,
             'height':patientInfo[0].height
           }
-          res.send(patient);
+          res.status(200).json(patient);
 
         });
       }
@@ -262,13 +265,12 @@ app.get('/user/:id', function (req, res) {
             'hospital': doctorInfo[0].hospital,
             'specialty': doctorInfo[0].specialty
           }
-          res.send(doctor);
+          res.status(200).json(doctor);
         });
       }
       //res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
-      res.send('User not found');
-      res.status(400).json(errors)
+      res.status(400).json('User not found')
     }
   });
 });
@@ -276,9 +278,9 @@ app.get('/user/:id', function (req, res) {
 app.get('/patients' , (req, res)=>{
   //tengo que meter un validator aqui o un typeCheck?
   patientManager.allPatients( (allPatients, errors) =>{
-    //console.log(typeof allPatients); Para saber que tipo de dato es
-    console.log(allPatients); //Lo debo dejar aqui?
-  })
+
+    res.status(200).json(allPatients);
+  });
 });
 
 app.get('/doctors' , (req, res)=>{
@@ -292,8 +294,7 @@ app.get('/doctors' , (req, res)=>{
 app.get('/registers/patients/:patientId', (req, res) =>{
   var patientId = req.params.patientId;
   patientManager.onePatient(patientId, (allRegisters, errors) =>{
-    console.log(allRegisters);
-    res.send('SUCCESS');
+    res.status(200).json(allRegisters);
   });
 });
 
@@ -301,8 +302,7 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
-    console.log(allRegisters);
-    res.send('SUCCESS');
+    res.status(200).json(allRegisters);
   })
 })
 
@@ -311,24 +311,21 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
 app.delete('/user/:id', function (req, res){
   var id = req.params.id;
   userManager.delete(id, function(status, errors){
-    console.log(status);
-    res.send(status);
+    res.status(200),json(status);
   });
 });
 
 app.delete('/registers/patients/:registerId', function (req, res){
   var registerId = req.params.registerId;
   patientManager.deleteRegister(registerId, function(status, errors){
-    console.log(status);
-    res.send(status);
+    res.status(200),json(status);
   });
 });
 
 app.delete('/registers/doctors/:registerId', function (req, res){
   var registerId = req.params.registerId;
   doctorManager.deleteRegister(registerId, function(status, errors){
-    console.log(status);
-    res.send(status);
+    res.status(200),json(status);
   });
 });
 

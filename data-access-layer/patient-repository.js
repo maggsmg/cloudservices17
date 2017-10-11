@@ -44,7 +44,6 @@ exports.getPatient = function(id, callback){
 exports.getAllPatients = function(callback){
   const errors = [];
   var query_string = "SELECT * FROM users INNER JOIN patients ON users.id = patients.user_id"
-  console.log(query_string);
   con.query(query_string, function (err, result, fields) {
       if (err) throw err;
       callback(result,errors);
