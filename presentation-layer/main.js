@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/registers/doctors/5') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/7') {
     next();
   }
   else{
@@ -234,15 +234,38 @@ app.get('/user/:id', function (req, res) {
 
       if(role == 'patient'){
         patientManager.allInfo(id, (patientInfo, errors) =>{
-          //console.log(patientInfo);
+          var patient = {
+            'user_id': patientInfo[0].user_id,
+            'patient_id': patientInfo[0].id,
+            'role': patientInfo[0].role,
+            'name': patientInfo[0].name,
+            'email': patientInfo[0].email,
+            'profile_pic': patientInfo[0].profile_pic,
+            'age': patientInfo[0].age,
+            'gender': patientInfo[0].gender,
+            'weight': patientInfo[0].weight,
+            'height':patientInfo[0].height
+          }
+          res.send(patient);
+
         });
       }
       else if(role == 'doctor'){
         doctorManager.allInfo(id, (doctorInfo, errors) =>{
-          //console.log(doctorInfo);
+          var doctor = {
+            'user_id': doctorInfo[0].user_id,
+            'doctor_id': doctorInfo[0].id,
+            'role': doctorInfo[0].role,
+            'name': doctorInfo[0].name,
+            'email': doctorInfo[0].email,
+            'profile_pic': doctorInfo[0].profile_pic,
+            'hospital': doctorInfo[0].hospital,
+            'specialty': doctorInfo[0].specialty
+          }
+          res.send(doctor);
         });
       }
-      res.send(userInfo) //no se si aqui deba ir res.json o res.send
+      //res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
       res.send('User not found');
       res.status(400).json(errors)
