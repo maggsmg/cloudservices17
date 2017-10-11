@@ -121,7 +121,7 @@ app.get('/auth/google/callback',
 //__________POSTS___________
 app.post('/authenticate', function(req, res) {
   var login = req.body;
-  userManager.jwtoken(login.email, function(user, err){
+  userManager.findUserByEmail(login.email, function(user, err){
 
     if (err) throw err;
 
