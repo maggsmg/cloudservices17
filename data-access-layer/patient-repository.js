@@ -62,6 +62,18 @@ exports.getThisPatient = function(id, callback){
 
 }
 
+exports.getUserById = function(id, callback){
+  var query_string = "SELECT id, user_id FROM patients WHERE id ='" + id + "';" ;
+  // console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      if (result.length == 1)
+        callback(result[0],err);
+      else
+        callback(null, err);
+  });
+}
+
 exports.delete = function(userId, callback){
   const errors = [];
 

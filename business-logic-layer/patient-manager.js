@@ -15,7 +15,16 @@ exports.create = function(userCreate, idCreated, callback){
 
 exports.createRegister = function (register, patientId, callback) {
 
-	patientRepository.addRegister(register, patientId, callback);
+	patientRepository.getUserById(patientId, function(user_exists,err2){
+		if (user_exists == null){
+			callback ('Patient does not exist', err2)
+		}
+
+		else{
+			patientRepository.addRegister(register, patientId, callback);
+		}
+
+	});
 }
 
 exports.allInfo = function(id, callback){
@@ -29,7 +38,15 @@ exports.allPatients = function(callback){
 	patientRepository.getAllPatients(callback);
 }
 
-exports.onePatient = function(id, callback){
+exports.onePatient = function(patientId, callback){
+	patientRepository.getUserById(patientId, function(user_exists,err2){
+		if (user_exists == null){
+			callback ('Patient does not exist', err2)
+		}
 
-	patientRepository.getThisPatient(id, callback);
+		else{
+			patientRepository.getThisPatient(patientId, callback);
+		}
+
+	});//patientRepository.getThisPatient(id, callback);
 }

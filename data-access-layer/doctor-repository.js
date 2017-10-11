@@ -23,10 +23,15 @@ exports.addRegister = function(register, patientId, doctorId, callback){
   const errors =[];
 
   var query_string = "INSERT INTO doctorRegister (date, patient_id, doctor_id, weight_control, prescription) VALUES ( NOW()," + "'" + patientId + "','" + doctorId + "','" + register.weight_control + "','" + register.prescription + "');"
-  //console.log(query_string);
+  var query_string2 = "UPDATE patients SET weight =" + "'" + register.weight_control + "' WHERE id="+ "'" + patientId + "';"
+
   con.query(query_string, function (err, result, fields) {
     if (err) throw err;
-    callback('Register Created', errors);
+    con.query(query_string2, function (err, result, fields) {
+      if (err) throw err;
+      callback('Register Created', err);
+    });
+    //callback('Register Created', err);
   });
 
 }
@@ -60,6 +65,18 @@ exports.getThis = function(patientId, doctorId, callback){
       callback(result,errors);
   });
 
+}
+
+exports.getUserById = function(id, callback){
+  var query_string = "SELECT id, user_id FROM doctors WHERE id ='" + id + "';" ;
+  // console.log(query_string);
+  con.query(query_string, function (err, result, fields) {
+      if (err) throw err;
+      if (result.length == 1)
+        callback(result[0],err);
+      else
+        callback(null, err);
+  });
 }
 
 exports.delete = function(userId, callback){

@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/user/updatePwd') {
+  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/doctorRegister/3/5') {
     next();
   }
   else{
@@ -187,8 +187,8 @@ app.post('/user/create', function (req,res) {
   //res.send();
 });
 
-app.post('/user/newPatientRegister/:id', function (req,res) {
-  var patientId = req.params.id;
+app.post('/user/newPatientRegister/:patientId', function (req,res) {
+  var patientId = req.params.patientId;
   const register = req.body;
 
   patientManager.createRegister(register, patientId, (status, errors) =>{
@@ -205,11 +205,8 @@ app.post('/user/newDoctorRegister/:patientId/:doctorId', function (req,res) {
   var doctorId = req.params.doctorId;
   const register = req.body;
   doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
-    if(errors.length == 0){
-      console.log('Doctor Register Created for patient:' + patientId);
-      res.send(status); //Como hacer que esto tambien aparezca
-    }
-
+    console.log('Doctor Register Created for patient:' + patientId);
+    res.send(status);
   });
 });
 
@@ -233,9 +230,8 @@ app.get('/user/:id', function (req, res) {
 	var id = req.params.id;
   userManager.role(id, function(userInfo, errors){
     if(errors.length == 0){
-      //console.log('yallegue');
       var role = userInfo[0].role;
-      //console.log(role);
+
       if(role == 'patient'){
         patientManager.allInfo(id, (patientInfo, errors) =>{
           //console.log(patientInfo);
@@ -248,6 +244,7 @@ app.get('/user/:id', function (req, res) {
       }
       res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
+      res.send('User not found');
       res.status(400).json(errors)
     }
   });
@@ -255,7 +252,6 @@ app.get('/user/:id', function (req, res) {
 
 app.get('/patients' , (req, res)=>{
   //tengo que meter un validator aqui o un typeCheck?
-
   patientManager.allPatients( (allPatients, errors) =>{
     //console.log(typeof allPatients); Para saber que tipo de dato es
     console.log(allPatients); //Lo debo dejar aqui?
@@ -270,8 +266,8 @@ app.get('/doctors' , (req, res)=>{
   })
 });
 
-app.get('/patientRegisters/:id', (req, res) =>{
-  var patientId = req.params.id;
+app.get('/allPatientRegisters/:patientId', (req, res) =>{
+  var patientId = req.params.patientId;
   patientManager.onePatient(patientId, (allRegisters, errors) =>{
     console.log(allRegisters);
     res.send('SUCCESS');
