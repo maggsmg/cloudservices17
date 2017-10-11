@@ -14,11 +14,9 @@ exports.addUser = function(user, hash, callback){
 	const errors = [];
   var inserted_id;
   var query_string = "INSERT INTO users (role, name, email, password) VALUES (" + "'" + user.role + "','" + user.name + "','" + user.email + "','" + hash + "');"
-  // console.log(query_string);
   con.query(query_string, function (err, result, fields) {
 	   if (err) throw err;
      inserted_id = result.insertId;
-	   // console.log(result); //Dejarlo o no dejarlo esta es la cuestion
      callback (result.insertId,'User created', errors);
 	  });
 }
@@ -100,6 +98,30 @@ exports.getPwd = function(email, callback){
 
 }
 
+exports.findUserByEmail = function(email, callback){
+
+	con.query("SELECT * FROM users WHERE email =" + "'" + email + "'", function (err, result, fields) {
+  		if (err) throw err;
+      if (result.length == 1){
+        user = {
+          'email'       : email,
+          'name'        : result[0].name,
+          'passwd'      : result[0].password,
+          'found'       : true
+        }
+  		  callback( user ,err);
+      }
+      else{
+        user = {
+          'email'       : email,
+          'found'       : false
+        }
+        callback(1, err);
+      }
+	});
+
+}
+
 exports.updatePwd = function(email, pwd, callback){
   const errors = [];
 
@@ -124,10 +146,6 @@ exports.deleteUser = function(id, callback){
     		callback('SUCCESS',errors);
 		});
 }
-// exports.getAll = function(callback){
-// 	const query = `SELECT id, username, password FROM accounts ORDER BY id`
-// 	db.getMany(query, {}, callback)
-// }
 
 exports.findOneGoogleUser = function (id, callback){
   const err_notFound = new Error('User not Found');

@@ -1,25 +1,28 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const userManager = require('../business-logic-layer/user-manager');
+const patientManager  = require('../business-logic-layer/patient-manager');
 
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 // ------- GOOGLE AUTHENTICATION ---------    
 // _______ PASSPORT CONFIG ________
 // used to serialize the user for the session
 passport.serializeUser(function(user, done) {
+        console.log('serializing');
     done(null, user.google_id);
 });
 
 // used to deserialize the user
 passport.deserializeUser(function(id, done) {
     userManager.findOneGoogleUser(id, function(err, user) {
+        console.log('Des Serializing');
+        if (!user)
+          done(null, null);
+        else
         done(err, user);
     });
 });
-
-// code for login (use('local-login', new LocalStategy))
-// code for signup (use('local-signup', new LocalStategy))
-// code for facebook (use('facebook', new FacebookStrategy))
-// code for twitter (use('twitter', new TwitterStrategy))
 
 // =========================================================================
 // GOOGLE ==================================================================
@@ -48,6 +51,13 @@ function(token, refreshToken, profile, done) {
             if (user) {
                 // if a user is found, log them in
                 console.log('Google User Logged!');
+
+                var token2 = jwt.sign({
+                  email: user.email,
+                  password: user.password_token
+                }, config.secret, { expiresIn: 60 * 60 });
+
+                user.token = token2;
                 console.log(user);
                 return done(null, user);
             } else {
@@ -63,9 +73,13 @@ function(token, refreshToken, profile, done) {
                 }
                 userManager.createGoogleUser(userToSave, function(userCreated, err){
                   if (err) throw err;   
+                  
+
                   console.log('Usuario Google Creado:');
                   console.log(userCreated);
-                  return done(null, userCreated);              
+            
+                  return done(null, userCreated); 
+
                 });
                   
             }

@@ -55,17 +55,20 @@ exports.findOneGoogleUser = function(user, callback){
   userRepository.findOneGoogleUser(user, callback);
 }
 
+//preguntar si todavia lo uso
 exports.createGoogleUser = function(user, callback){
   userRepository.addGoogleUser(user, callback);
 }
 
-
-exports.role = function(id, callback){
-	//console.log('entro a la funcion')
-	userRepository.getUserRole(id, callback);
-	//callback(null,errors);
+exports.findUserByEmail = function(user, callback){
+	userRepository.findUserByEmail(user, callback);
 }
 
+exports.role = function(id, callback){
+	userRepository.getUserRole(id, callback);
+}
+
+//preguntar si todavia lo uso
 exports.jwtoken = function(email, callback){
 	userRepository.getPwd(email, callback);
 }

@@ -14,13 +14,17 @@ const configurePassport = require('../config/passport');
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8000; // used to create, sign, and verify tokens
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+
 
 app.set('superSecret', config.secret); // secret variable
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(express.cookieParser('secret'));
+app.use(express.cookieSession()); // Express cookie session middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -33,8 +37,13 @@ app.use((req, res, next) => {
   console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/profile' || pathname == '/user/create' || pathname == '/getGoogleUser/106879306004829508354'|| pathname == '/registers/doctors/3/5') {
+  if (pathname == '/' || pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/user/create' || pathname == '/login') {
+    console.log('Route ignored');
     next();
+  }
+  else if (req.user){
+  console.log('User logged by Google')
+  next();
   }
   else{
     // check header or url parameters or post parameters for token
@@ -75,8 +84,17 @@ app.get('/login', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-   console.log("profile");
-   res.send('Logged in by Google Auth2.0!');
+
+  if (req.user)
+   res.send('User Logged: ' + req.user.name + '<br> Email: ' + req.user.email);
+  else{
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    decoded = jwt.verify(token, app.get('superSecret'));
+    console.log(decoded);
+
+    res.send('User Logged: ' + decoded.name + '\nEmail: ' + decoded.email)
+  }
+
 });
 
 app.get('/getGoogleUser/:id', function(req,res){
@@ -89,26 +107,6 @@ app.get('/getGoogleUser/:id', function(req,res){
         res.send('User Not Found');
   });
 })
-
-app.get('/createGoogleUser', function(req,res){
-  userToSave = {
-    'name'      :   'Miguel Miramontes',
-    'role'      :   'patient',
-    'email'     :   'migmira@hotmfail1.com',
-    'password'  :   '',
-    'google_id' :   4,
-    'token'     :   'token'
-  }
-  userManager.createGoogleUser(userToSave, function(userCreated, err){
-    if(err.length == 0){
-      console.log('Usuario Creado:');
-      console.log(userCreated);
-      res.send('Usuario '+ userCreated.name  + ' Creado');
-    }else{
-      res.status(400).json(errors)
-    }
-  });
-});
 
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
 
@@ -311,21 +309,21 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
 app.delete('/user/:id', function (req, res){
   var id = req.params.id;
   userManager.delete(id, function(status, errors){
-    res.status(200),json(status);
+    res.status(200).json(status);
   });
 });
 
 app.delete('/registers/patients/:registerId', function (req, res){
   var registerId = req.params.registerId;
   patientManager.deleteRegister(registerId, function(status, errors){
-    res.status(200),json(status);
+    res.status(200).json(status);
   });
 });
 
 app.delete('/registers/doctors/:registerId', function (req, res){
   var registerId = req.params.registerId;
   doctorManager.deleteRegister(registerId, function(status, errors){
-    res.status(200),json(status);
+    res.status(200).json(status);
   });
 });
 
