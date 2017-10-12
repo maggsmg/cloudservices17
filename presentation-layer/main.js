@@ -2,6 +2,7 @@
 const http = require('http');
 const path = require('path');
 const express = require('express');
+const logger = require('morgan');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const typeCheck = require('type-check').typeCheck;
@@ -11,12 +12,38 @@ const doctorManager   = require('../business-logic-layer/doctor-manager');
 const config = require('../config/config');
 const passport = require('passport');
 const configurePassport = require('../config/passport');
-const app = express();
-const server = http.createServer(app);
-const port = process.env.PORT || 8000; // used to create, sign, and verify tokens
+const multer = require('multer');
+const multerAzure = require('multer-azure');
+const dateFormat = require('dateformat');
+const md5 = require('md5');
+const rand = require('../utils/randomInt');
 
+// Azure storage
+const upload = multer({
+  storage: multerAzure({
+    connectionString: "DefaultEndpointsProtocol=https;AccountName=myresourcegroupdiag566;AccountKey=yXoyxdx3R6RfUft4FxgsaWrN2ABNkBiwoJnwzcc4A2cJxDeuAOqeJ1biJHnc7gnI+VgtC7wFzL2cx48GGpzE2g==;EndpointSuffix=core.windows.net",
+    account: 'myresourcegroupdiag566',
+    key: 'yXoyxdx3R6RfUft4FxgsaWrN2ABNkBiwoJnwzcc4A2cJxDeuAOqeJ1biJHnc7gnI+VgtC7wFzL2cx48GGpzE2g==',
+    container: 'demoblockblobcontainer-4a1814a0-aee7-11e7-9b09-910262c10cfa',
+    blobPathResolver: function(req, file, callback) {
+      var blobPath = generateName(req, file);
+      callback(null, blobPath);
+    }
+  })
+});
+
+function generateName(req, file) {
+  var name = file.originalname;
+  var ext = path.extname(name);
+  var newname = md5(dateFormat(new Date(), 'yyyymmddHHMMss') + rand(0, 1000));
+  return newname+ext;
+}
+
+const app = express();
+// const port = process.env.PORT || 8000; // used to create, sign, and verify tokens
 
 app.set('superSecret', config.secret); // secret variable
+app.use(logger('dev'));
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); //
@@ -29,19 +56,18 @@ app.use(passport.session());
 // ------------ MIDDLEWARE ---------------
 app.use((req, res, next) => {
   var now = new Date().toString();
-  var url = req.url;
   var pathname = req._parsedUrl.pathname;
-  var log = `${pathname}: ${req.method}`;
-  console.log(log);
 
   //The following routes are ignored by middleware
-  if (pathname == '/' || pathname == 'authenticate' || pathname == '/auth/google' || pathname == '/auth/google/' || pathname == '/auth/google/callback' || pathname == '/authenticate' || pathname == '/user/create' || pathname == '/login') {
+  var ignored_paths = ['/', '/authenticate', '/auth/google', '/auth/google/', '/auth/google/callback', '/user/create', '/login', '/upload'];
+
+  if(ignored_paths.indexOf(pathname) > -1) {
     console.log('Route ignored');
     next();
   }
   else if (req.user){
-  console.log('User logged by Google')
-  next();
+    console.log('User logged by Google');
+    next();
   }
   else{
     // check header or url parameters or post parameters for token
@@ -73,12 +99,17 @@ app.use((req, res, next) => {
 
 app.get('/', function (req, res) {
    console.log("Home");
-   res.send('Welcome!');
+   res.send('Hello world this is the main.js file');
 });
 
 app.get('/login', function (req, res) {
    console.log("login");
    res.send('Login!');
+});
+
+app.post('/upload', upload.single('imgUpload'), (req, res, next) => {
+  // console.log(req.file);
+  res.send({success: 'success', blobURI: req.file.url, message: 'Successfully uploaded the image'});
 });
 
 app.get('/profile', function (req, res) {
@@ -180,7 +211,6 @@ app.post('/user/create', function (req,res) {
     res.status(200).json({success: 'success', message: 'User was successfully created'});
 	})
 
-  //res.send();
 });
 
 app.post('/registers/:patientId', function (req,res) {
@@ -211,7 +241,7 @@ app.post('/registers/:patientId/:doctorId', function (req,res) {
 });
 
 //__________PATCHS___________
-app.patch('/user/updatePwd', function (req, res) {
+app.patch('/user', function (req, res) {
   var userpwd = req.body;
   userManager.updatePwd(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
@@ -264,7 +294,6 @@ app.get('/user/:id', function (req, res) {
           res.status(200).json(doctor);
         });
       }
-      //res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
       res.status(400).json({error: 'error', message: 'User not found'})
     }
@@ -272,7 +301,6 @@ app.get('/user/:id', function (req, res) {
 });
 
 app.get('/patients' , (req, res)=>{
-  //tengo que meter un validator aqui o un typeCheck?
   patientManager.allPatients( (allPatients, errors) =>{
 
     res.status(200).json(allPatients);
@@ -332,6 +360,9 @@ app.delete('/registers/doctors/:registerId', function (req, res){
   res.status(400).json({error: 'error', message: 'Could not delete Register'});
 });
 
-app.listen(8000 , () => {
-  console.log('Server listening on port 8000');
-})
+var port = process.env.PORT || 8080;
+app.set('port', port);
+
+app.listen(app.get('port'), () => {
+  console.log('Server listening on port ' + port);
+});

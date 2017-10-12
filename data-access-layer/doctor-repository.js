@@ -1,14 +1,4 @@
-var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "cloudservices"
-});
-con.connect(function(err) {
-  if (err) throw err;
-});
+var con = require('../dbconnection');
 
 exports.addDoctor = function(userCreate, idCreated, callback){
 	const errors = [];
@@ -31,7 +21,6 @@ exports.addRegister = function(register, patientId, doctorId, callback){
       if (err) throw err;
       callback('Register Created', err);
     });
-    //callback('Register Created', err);
   });
 
 }

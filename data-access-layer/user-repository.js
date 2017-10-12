@@ -1,14 +1,4 @@
-var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "cloudservices"
-});
-con.connect(function(err) {
-  if (err) throw err;
-});
+var con = require('../dbconnection');
 
 exports.addUser = function(user, hash, callback){
 	const errors = [];
