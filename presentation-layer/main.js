@@ -167,17 +167,17 @@ app.post('/user/create', function (req,res) {
 	  expectedStructure = '{role:String, name: String, email: String, password: String, hospital: String, specialty: String}';
   }
   else{
-		res.status(400).json(["invalidRole"])
+		res.status(400).json({error: 'error', message: 'Could not create user, invalidRole'})
 		return
   }
 
   if(!typeCheck(expectedStructure, userCreate)){
-  		res.status(400).json(["invalidInput"])
+  		res.status(400).json({error: 'error', message: 'Could not create user, invalidInput'})
   		return
   }
 
   userManager.create(userCreate, function(err, status){
-    res.send(status);
+    res.status(200).json({success: 'success', message: 'User was successfully created'});
 	})
 
   //res.send();
@@ -190,10 +190,10 @@ app.post('/registers/:patientId', function (req,res) {
   patientManager.createRegister(register, patientId, (status, errors) =>{
     if(errors.length == 0){
       console.log('Patient Register Created');
-      res.status(200).json([status]);
+      res.status(200).json({success: 'success', message: 'Register was successfully created'});
     }
     else{
-      res.status(400).json(["Please try again :("]);
+      res.status(400).json({error: 'error', message: 'Could not create Register'});
     }
 
   });
@@ -205,9 +205,9 @@ app.post('/registers/:patientId/:doctorId', function (req,res) {
   const register = req.body;
   doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
     console.log('Doctor Register Created for patient:' + patientId);
-    res.status(200).json([status]);
+    res.status(200).json({success: 'success', message: 'Register was successfully created'});
   });
-  res.status(400).json(["Please try again :("])
+  res.status(400).json({error: 'error', message: 'Could not create Register'})
 });
 
 //__________PATCHS___________
@@ -216,9 +216,9 @@ app.patch('/user/updatePwd', function (req, res) {
   userManager.updatePwd(userpwd.email, userpwd.password, function(update, errors){
     if(errors.length == 0){
       console.log(update);
-      res.status(200).json('Password Updated')
+      res.status(200).json({success: 'success', message: 'Password was successfully updated.'});
     }else{
-      res.status(400).json(errors);
+      res.status(400).json({error: 'error', message: 'Could not update Password'});
     }
   });
 });
@@ -266,7 +266,7 @@ app.get('/user/:id', function (req, res) {
       }
       //res.send(userInfo) //no se si aqui deba ir res.json o res.send
     }else{
-      res.status(400).json('User not found')
+      res.status(400).json({error: 'error', message: 'User not found'})
     }
   });
 });
@@ -277,14 +277,16 @@ app.get('/patients' , (req, res)=>{
 
     res.status(200).json(allPatients);
   });
+
+  res.status(400).json({error: 'error', message: 'Could not retrieve Patients'});
 });
 
 app.get('/doctors' , (req, res)=>{
-  //tengo que meter un validator aqui o un typeCheck?
+
   doctorManager.allDoctors( (allDoctors, errors) =>{
-    //console.log(typeof allPatients); Para saber que tipo de dato es
-    console.log(allDoctors); //Lo debo dejar aqui?
+    res.status(200).json(allDoctors);
   })
+  res.status(400).json({error: 'error', message: 'Could not retrieve Doctors'});
 });
 
 app.get('/registers/patients/:patientId', (req, res) =>{
@@ -292,6 +294,7 @@ app.get('/registers/patients/:patientId', (req, res) =>{
   patientManager.onePatient(patientId, (allRegisters, errors) =>{
     res.status(200).json(allRegisters);
   });
+  res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
 });
 
 app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
@@ -299,7 +302,8 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
   var doctorId = req.params.doctorId;
   doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
     res.status(200).json(allRegisters);
-  })
+  });
+  res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
 })
 
 //__________DELETES___________
@@ -307,22 +311,25 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
 app.delete('/user/:id', function (req, res){
   var id = req.params.id;
   userManager.delete(id, function(status, errors){
-    res.status(200).json(status);
+    res.status(200).json({success: 'success', message: 'User was successfully deleted'});
   });
+  res.status(400).json({error: 'error', message: 'Could not delete User'});
 });
 
 app.delete('/registers/patients/:registerId', function (req, res){
   var registerId = req.params.registerId;
   patientManager.deleteRegister(registerId, function(status, errors){
-    res.status(200).json(status);
+    res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
   });
+  res.status(400).json({error: 'error', message: 'Could not delete Register'});
 });
 
 app.delete('/registers/doctors/:registerId', function (req, res){
   var registerId = req.params.registerId;
   doctorManager.deleteRegister(registerId, function(status, errors){
-    res.status(200).json(status);
+    res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
   });
+  res.status(400).json({error: 'error', message: 'Could not delete Register'});
 });
 
 app.listen(8000 , () => {
