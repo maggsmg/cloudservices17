@@ -5,7 +5,7 @@ const patientManager  = require('../business-logic-layer/patient-manager');
 
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-// ------- GOOGLE AUTHENTICATION ---------    
+// ------- GOOGLE AUTHENTICATION ---------
 // _______ PASSPORT CONFIG ________
 // used to serialize the user for the session
 passport.serializeUser(function(user, done) {
@@ -28,9 +28,9 @@ passport.deserializeUser(function(id, done) {
 // GOOGLE ==================================================================
 // =========================================================================
 passport.use(new GoogleStrategy({
-    clientID: '1004659648037-jdq3vntbh1nh7mgljtoprsqgag4p8vvc.apps.googleusercontent.com',
-    clientSecret: 'cVksIKu7IS1FrmRwLy6GLcik',
-    callbackURL: 'http://127.0.0.1:8000/auth/google/callback'
+    clientID: '61870319209-gosfauvpkcrf2pur4pns07tu9us3o3t6.apps.googleusercontent.com',
+    clientSecret: 'knDzIkEWLLZ03gji0SibdQqc',
+    callbackURL: 'http://testcs17.azurewebsites.net/auth/google/callback'
 },
 function(token, refreshToken, profile, done) {
     // make the code asynchronous
@@ -64,7 +64,7 @@ function(token, refreshToken, profile, done) {
                 // if the user isnt in our database, create a new user
                 console.log('*****************Registrar Nuevo Usuario de Google*****************************')
                 userToSave = {
-                  'name'      :   profile.displayName, 
+                  'name'      :   profile.displayName,
                   'role'      :   '',
                   'email'     :   profile.emails[0].value,
                   'password'  :   '',
@@ -72,16 +72,16 @@ function(token, refreshToken, profile, done) {
                   'token'     :   token
                 }
                 userManager.createGoogleUser(userToSave, function(userCreated, err){
-                  if (err) throw err;   
-                  
+                  if (err) throw err;
+
 
                   console.log('Usuario Google Creado:');
                   console.log(userCreated);
-            
-                  return done(null, userCreated); 
+
+                  return done(null, userCreated);
 
                 });
-                  
+
             }
         });
     });
