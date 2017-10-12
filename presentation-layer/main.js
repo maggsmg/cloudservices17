@@ -307,36 +307,51 @@ app.get('/user/:id', function (req, res) {
 
 app.get('/patients' , (req, res)=>{
   patientManager.allPatients( (allPatients, errors) =>{
-
-    res.status(200).json(allPatients);
+    if(errors.length == 0){
+      res.status(200).json(allPatients);;
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not retrieve Patients'});
+    }
   });
 
-  res.status(400).json({error: 'error', message: 'Could not retrieve Patients'});
 });
 
 app.get('/doctors' , (req, res)=>{
 
   doctorManager.allDoctors( (allDoctors, errors) =>{
-    res.status(200).json(allDoctors);
+    if(errors.length == 0){
+      res.status(200).json(allDoctors);;
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not retrieve Doctors'});
+    }
   })
-  res.status(400).json({error: 'error', message: 'Could not retrieve Doctors'});
 });
 
-app.get('/registers/patients/:patientId', (req, res) =>{
+app.get('/patientRegisters/:patientId', (req, res) =>{
   var patientId = req.params.patientId;
   patientManager.onePatient(patientId, (allRegisters, errors) =>{
-    res.status(200).json(allRegisters);
+    if(errors.length == 0){
+      res.status(200).json(allRegisters);;
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
 });
 
-app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
+app.get('/doctorRegisters/:patientId/:doctorId', (req, res) =>{
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   doctorManager.oneDoctorPatient(patientId, doctorId, (allRegisters, errors) =>{
-    res.status(200).json(allRegisters);
+    if(errors.length == 0){
+      res.status(200).json(allRegisters);;
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not retrieve registers'});
 })
 
 //__________DELETES___________
@@ -344,25 +359,37 @@ app.get('/registers/doctors/:patientId/:doctorId', (req, res) =>{
 app.delete('/user/:id', function (req, res){
   var id = req.params.id;
   userManager.delete(id, function(status, errors){
-    res.status(200).json({success: 'success', message: 'User was successfully deleted'});
+    if(errors.length == 0){
+      res.status(200).json({success: 'success', message: 'User was successfully deleted'});
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not delete User'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not delete User'});
 });
 
-app.delete('/registers/patients/:registerId', function (req, res){
+app.delete('/patientRegisters/:registerId', function (req, res){
   var registerId = req.params.registerId;
   patientManager.deleteRegister(registerId, function(status, errors){
-    res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
+    if(errors.length == 0){
+      res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not delete Register'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not delete Register'});
 });
 
-app.delete('/registers/doctors/:registerId', function (req, res){
+app.delete('/doctorRegisters/:registerId', function (req, res){
   var registerId = req.params.registerId;
   doctorManager.deleteRegister(registerId, function(status, errors){
-    res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
+    if(errors.length == 0){
+      res.status(200).json({success: 'success', message: 'Register was successfully deleted'});
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not delete Register'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not delete Register'});
 });
 
 var port = process.env.PORT || 8080;
