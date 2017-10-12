@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   var pathname = req._parsedUrl.pathname;
 
   //The following routes are ignored by middleware
-  var ignored_paths = ['/', '/authenticate', '/auth/google', '/auth/google/', '/auth/google/callback', '/user/create', '/login', '/upload'];
+  var ignored_paths = ['/', '/authenticate', '/auth/google', '/auth/google/', '/auth/google/callback', '/user', '/login', '/upload'];
 
   if(ignored_paths.indexOf(pathname) > -1) {
     console.log('Route ignored');
@@ -191,7 +191,7 @@ app.post('/user', function (req,res) {
 
   // IF PATIENT
   if(role === 'patient'){
-	  expectedStructure = '{role:String, name: String, email: String, password: String, gender: CHAR, age: INT, height: INT, weight:INT }';
+	  expectedStructure = '{role:String, name: String, email: String, password: String, gender: String, age: Number, height: Number, weight:Number}';
 	}
   // IF DOCTOR
   else if (role === 'doctor'){
@@ -213,7 +213,7 @@ app.post('/user', function (req,res) {
 
 });
 
-app.post('/registers/:patientId', function (req,res) {
+app.post('/patientRegisters/:patientId', function (req,res) {
   var patientId = req.params.patientId;
   const register = req.body;
 
@@ -229,15 +229,20 @@ app.post('/registers/:patientId', function (req,res) {
   });
 });
 
-app.post('/registers/:patientId/:doctorId', function (req,res) {
+app.post('/doctorRegisters/:patientId/:doctorId', function (req,res) {
   var patientId = req.params.patientId;
   var doctorId = req.params.doctorId;
   const register = req.body;
   doctorManager.createRegister(register, patientId, doctorId, (status, errors) =>{
-    console.log('Doctor Register Created for patient:' + patientId);
-    res.status(200).json({success: 'success', message: 'Register was successfully created'});
+    if(errors == null){
+      console.log('Doctor Register Created for patient:' + patientId);
+      res.status(200).json({success: 'success', message: 'Register was successfully created'});
+    }
+    else{
+      res.status(400).json({error: 'error', message: 'Could not create Register'});
+    }
   });
-  res.status(400).json({error: 'error', message: 'Could not create Register'})
+
 });
 
 //__________PATCHS___________
