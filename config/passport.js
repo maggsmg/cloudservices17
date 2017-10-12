@@ -28,16 +28,16 @@ passport.deserializeUser(function(id, done) {
 // GOOGLE ==================================================================
 // =========================================================================
 passport.use(new GoogleStrategy({
-    clientID: '61870319209-gosfauvpkcrf2pur4pns07tu9us3o3t6.apps.googleusercontent.com',
-    clientSecret: 'knDzIkEWLLZ03gji0SibdQqc',
-    callbackURL: 'http://testcs17.azurewebsites.net/auth/google/callback'
+    clientID: '61870319209-v0pq2tpg7ech4rg54a1ojg3ofi49dblt.apps.googleusercontent.com',
+    clientSecret: 'VSDPynDg9-8X78DHAyXLjEm-',
+    callbackURL: 'http://127.0.0.1:8080/auth/google/callback'
 },
 function(token, refreshToken, profile, done) {
     // make the code asynchronous
     // User.findOne won't fire until we have all our data back from Google
     process.nextTick(function() {
-        // console.log('----------token---------------------');
-        // console.log(token);
+         console.log('----------token---------------------');
+         console.log(token);
         // console.log('----------refreshToken--------------');
         // console.log(refreshToken);
         // console.log('----------profile------------------');
@@ -46,6 +46,7 @@ function(token, refreshToken, profile, done) {
         // console.log(done);
         // try to find the user based on their google id
         userManager.findOneGoogleUser( profile.id , function(err, user) {
+          console.log('finding google user');
             if (err)
                 return done(err);
             if (user) {
@@ -56,7 +57,7 @@ function(token, refreshToken, profile, done) {
                   email: user.email,
                   password: user.password_token
                 }, config.secret, { expiresIn: 60 * 60 });
-
+                console.log(token2);
                 user.token = token2;
                 console.log(user);
                 return done(null, user);

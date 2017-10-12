@@ -57,7 +57,7 @@ app.use(passport.session());
 app.use((req, res, next) => {
   var now = new Date().toString();
   var pathname = req._parsedUrl.pathname;
-
+  console.log(pathname);
   //The following routes are ignored by middleware
   var ignored_paths = ['/', '/authenticate', '/auth/google', '/auth/google/', '/auth/google/callback', '/user', '/login', '/upload'];
 
@@ -70,6 +70,7 @@ app.use((req, res, next) => {
     next();
   }
   else{
+    console.log('hello motherfuckers');
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // decode token
