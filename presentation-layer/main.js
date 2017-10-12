@@ -184,14 +184,14 @@ app.post('/authenticate', function(req, res) {
 });
 
 //____CREATE NEW USER________
-app.post('/user/create', function (req,res) {
+app.post('/user', function (req,res) {
   const userCreate = req.body;
   var role = userCreate.role;
   var expectedStructure = '';
 
   // IF PATIENT
   if(role === 'patient'){
-	  expectedStructure = '{role:String, name: String, email: String, password: String, gender: String, age: String, height: String, weight:String }';
+	  expectedStructure = '{role:String, name: String, email: String, password: String, gender: CHAR, age: INT, height: INT, weight:INT }';
 	}
   // IF DOCTOR
   else if (role === 'doctor'){

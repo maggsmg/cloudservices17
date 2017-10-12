@@ -2,14 +2,16 @@
 
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `google_id` varchar(30) NULL UNIQUE,
+  `google_id` varchar(30) DEFAULT NULL,
   `role` varchar(10) NOT NULL DEFAULT '',
   `name` varchar(30) NOT NULL DEFAULT '',
-  `email` varchar(40) NOT NULL UNIQUE DEFAULT '',
-  `password` varchar(30) NOT NULL DEFAULT '',
+  `email` varchar(40) NOT NULL DEFAULT '',
+  `password` varchar(80) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `profile_pic` varchar(50) DEFAULT NULL,
-  `token` varchar(300) NULL,
-  PRIMARY KEY (`id`)
+  `token` varchar(300) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `google_id` (`google_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `patients` (
@@ -80,4 +82,3 @@ WHERE patientRegister.patient_id = 43
 SELECT *
 FROM doctorRegister
 WHERE patient_id = 15 AND doctor_id = 3
-
