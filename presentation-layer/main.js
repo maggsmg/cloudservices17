@@ -70,7 +70,6 @@ app.use((req, res, next) => {
     next();
   }
   else{
-    console.log('hello motherfuckers');
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // decode token
@@ -115,8 +114,10 @@ app.post('/upload', upload.single('imgUpload'), (req, res, next) => {
 
 app.get('/profile', function (req, res) {
 
-  if (req.user)
-   res.send('User Logged: ' + req.user.name + '<br> Email: ' + req.user.email);
+  if (req.user){
+    res.send(req.user);
+  }
+   //res.send('User Logged: ' + req.user.name + '<br> Email: ' + req.user.email);
   else{
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     decoded = jwt.verify(token, app.get('superSecret'));

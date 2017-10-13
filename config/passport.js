@@ -28,9 +28,9 @@ passport.deserializeUser(function(id, done) {
 // GOOGLE ==================================================================
 // =========================================================================
 passport.use(new GoogleStrategy({
-    clientID: '61870319209-v0pq2tpg7ech4rg54a1ojg3ofi49dblt.apps.googleusercontent.com',
-    clientSecret: 'VSDPynDg9-8X78DHAyXLjEm-',
-    callbackURL: 'http://127.0.0.1:8080/auth/google/callback'
+    clientID: '61870319209-gosfauvpkcrf2pur4pns07tu9us3o3t6.apps.googleusercontent.com',
+    clientSecret: 'knDzIkEWLLZ03gji0SibdQqc',
+    callbackURL: 'http://testcs17.azurewebsites.net/auth/google/callback'
 },
 function(token, refreshToken, profile, done) {
     // make the code asynchronous
@@ -58,7 +58,7 @@ function(token, refreshToken, profile, done) {
                   password: user.password_token
                 }, config.secret, { expiresIn: 60 * 60 });
                 console.log(token2);
-                user.token = token2;
+                user.token_logged = token2;
                 console.log(user);
                 return done(null, user);
             } else {
@@ -75,7 +75,12 @@ function(token, refreshToken, profile, done) {
                 userManager.createGoogleUser(userToSave, function(userCreated, err){
                   if (err) throw err;
 
-
+                  var token3 = jwt.sign({
+                    email: user.email,
+                    password: user.password_token
+                  }, config.secret, { expiresIn: 60 * 60 });
+                  console.log(token3);
+                  userCreated.token_login = token3;
                   console.log('Usuario Google Creado:');
                   console.log(userCreated);
 
