@@ -107,7 +107,7 @@ app.get('/login', function (req, res) {
    res.send('Login!');
 });
 
-app.post('/upload', upload.single('imgUpload'), (req, res, next) => {
+app.post('/picture', upload.single('imgUpload'), (req, res, next) => {
    console.log(req.file);
   res.send({success: 'success', blobURI: req.file.url, message: 'Successfully uploaded the image'});
 });
@@ -150,7 +150,7 @@ app.get('/auth/google/callback',
 
 
 //__________POSTS___________
-app.post('/authenticate', function(req, res) {
+app.post('/tokens', function(req, res) {
   var login = req.body;
   userManager.findUserByEmail(login.email, function(user, err){
 
