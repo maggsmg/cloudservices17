@@ -220,7 +220,7 @@ app.post('/patientRegisters/:patientId', function (req,res) {
   const register = req.body;
 
   patientManager.createRegister(register, patientId, (status, errors) =>{
-    if(errors.length == 0){
+    if(errors == null){
       console.log('Patient Register Created');
       res.status(200).json({success: 'success', message: 'Register was successfully created'});
     }
