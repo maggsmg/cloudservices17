@@ -108,14 +108,14 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/upload', upload.single('imgUpload'), (req, res, next) => {
-  // console.log(req.file);
+   console.log(req.file);
   res.send({success: 'success', blobURI: req.file.url, message: 'Successfully uploaded the image'});
 });
 
 app.get('/profile', function (req, res) {
 
   if (req.user){
-    res.send(req.user);
+    res.send('User Logged: ' + req.user.name + '<br> Email: ' + req.user.email);
   }
    //res.send('User Logged: ' + req.user.name + '<br> Email: ' + req.user.email);
   else{
